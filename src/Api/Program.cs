@@ -1,6 +1,9 @@
 using Application.DependencyInjection;
+using Application.Interfaces.Services;
+using Infrastructure.Consumers.Users.CreateUserConsumer;
 using Infrastructure.DbContexts;
 using Infrastructure.DependencyInjection;
+using Infrastructure.Services;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,8 +23,24 @@ builder.Services.AddDbContext<PostgreDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // MassTransit + RabbitMQ
+//builder.Services.AddMassTransit(x =>
+//{
+//    x.UsingRabbitMq((context, cfg) =>
+//    {
+//        cfg.Host("localhost", "/", h =>
+//        {
+//            h.Username("guest");
+//            h.Password("guest");
+//        });
+//    });
+//});
+
+// MassTransit + RabbitMQ
 builder.Services.AddMassTransit(x =>
 {
+    // Регистрируем Consumer
+    x.AddConsumer<CreateUserConsumer>();
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host("localhost", "/", h =>
@@ -29,8 +48,17 @@ builder.Services.AddMassTransit(x =>
             h.Username("guest");
             h.Password("guest");
         });
+
+        // Настраиваем конкретную очередь для Consumer
+        cfg.ReceiveEndpoint("user-created-queue", e =>
+        {
+            e.ConfigureConsumer<CreateUserConsumer>(context);
+        });
     });
 });
+
+// Message Bus
+builder.Services.AddScoped<IMessageBusService, MessageBusService>();
 
 var app = builder.Build();
 

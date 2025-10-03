@@ -1,5 +1,5 @@
 ﻿using Application.Features.Users.Queries.GetUsers.Response;
-using Application.Interfaces;
+using Application.Interfaces.Repositories;
 using Mapster;
 using MediatR;
 

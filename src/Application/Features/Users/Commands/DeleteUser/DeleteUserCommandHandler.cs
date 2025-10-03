@@ -1,5 +1,5 @@
 ﻿using Application.Features.Users.Commands.DeleteUser.Response;
-using Application.Interfaces;
+using Application.Interfaces.Repositories;
 using Mapster;
 using MediatR;
 
