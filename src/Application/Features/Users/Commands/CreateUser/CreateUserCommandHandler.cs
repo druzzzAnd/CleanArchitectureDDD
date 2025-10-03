@@ -23,7 +23,7 @@ public class CreateUserCommandHandler
             request.CreateUserRequest.FirstName,
             request.CreateUserRequest.LastName);
 
-        await _userRepository.CreateAsync(user);
+        _userRepository.Create(user);
 
         return user.Adapt<CreateUserResponse>();
     }

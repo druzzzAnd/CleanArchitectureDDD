@@ -4,7 +4,9 @@ namespace Application.Interfaces;
 
 public interface IUserRepository
 {
-    Task<List<User>> GetAllAsync();
-    Task<User?> GetByIdAsync(Guid id);
-    Task CreateAsync(User user);
+    List<User>? GetAll();
+    User? GetById(Guid id);
+    void Create(User user);
+    void Update(User user);
+    void Delete(User user);
 }

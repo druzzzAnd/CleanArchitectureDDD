@@ -4,4 +4,4 @@ public record GetUsersResponse(
     Guid Id,
     string Email,
     string FirstName,
-    string LastaName);
+    string LastName);

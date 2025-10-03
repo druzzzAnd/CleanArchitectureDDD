@@ -14,9 +14,9 @@ public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, List<GetUsers
         _userRepository = userRepository;
     }
 
-    public async Task<List<GetUsersResponse>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+    public async Task<List<GetUsersResponse>?> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
-        var users = await _userRepository.GetAllAsync();
+        var users = _userRepository.GetAll();
 
         return users.Adapt<List<GetUsersResponse>>();
     }

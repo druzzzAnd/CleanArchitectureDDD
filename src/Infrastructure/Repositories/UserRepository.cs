@@ -1,32 +1,36 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
 using Infrastructure.DbContexts;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository(PostgreDbContext context) : IUserRepository
 {
-    private readonly PostgreDbContext _context;
-
-    public UserRepository(PostgreDbContext context)
+    public void Create(User user)
     {
-        _context = context;
+        context.Users.Add(user);
+        context.SaveChanges();
     }
 
-    public async Task CreateAsync(User user)
+    public List<User>? GetAll()
     {
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
+        return context.Users.ToList();
     }
 
-    public async Task<List<User>> GetAllAsync()
+    public User? GetById(Guid id)
     {
-        return await _context.Users.ToListAsync();
+        return context.Users.FirstOrDefault(f => f.Id == id);
     }
 
-    public async Task<User?> GetByIdAsync(Guid id)
+    public void Update(User user)
     {
-        return await _context.Users.FirstOrDefaultAsync(f => f.Id == id);
+        context.Users.Update(user);
+        context.SaveChanges();
+    }
+
+    public void Delete(User user)
+    {
+        context.Remove(user);
+        context.SaveChanges();
     }
 }
