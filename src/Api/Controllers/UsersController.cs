@@ -6,12 +6,14 @@ using Application.Features.Users.Commands.UpdateUser.Request;
 using Application.Features.Users.Queries.GetUserById;
 using Application.Features.Users.Queries.GetUsers;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class UsersController : Controller
 {
     private readonly IMediator _mediator;
