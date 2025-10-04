@@ -1,6 +1,6 @@
 ﻿using Application.Events.Users.CreateUser;
 using Application.Features.Users.Commands.CreateUser.Response;
-using Application.Interfaces.Repositories;
+using Application.Interfaces.Providers;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Mapster;
@@ -8,29 +8,23 @@ using MediatR;
 
 namespace Application.Features.Users.Commands.CreateUser;
 
-public class CreateUserCommandHandler
+public class CreateUserCommandHandler(IUnitOfWorkFactory unitOfWorkFactory, IMessageBusService messageBusService)
     : IRequestHandler<CreateUserCommand, CreateUserResponse>
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IMessageBusService _messageBusService;
-
-    public CreateUserCommandHandler(
-        IUserRepository userRepository,
-        IMessageBusService messageBusService)
-    {
-        _userRepository = userRepository;
-        _messageBusService = messageBusService;
-    }
-
     public async Task<CreateUserResponse> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
+        // create uow
+        await using var uow = unitOfWorkFactory.Create();
+
         // main logic
         var user = new User(
             request.CreateUserRequest.Email,
             request.CreateUserRequest.FirstName,
             request.CreateUserRequest.LastName);
 
-        _userRepository.Create(user);
+        uow.UserRepository.Create(user);
+
+        await uow.SaveChangesAsync();
 
         // send event into queue
         var createUserEvent = new CreateUserEvent(
@@ -41,7 +35,7 @@ public class CreateUserCommandHandler
             user.CreatedAt,
             user.UpdatedAt);
 
-        await _messageBusService.PublishAsync(createUserEvent);
+        await messageBusService.PublishAsync(createUserEvent);
 
         return user.Adapt<CreateUserResponse>();
     }

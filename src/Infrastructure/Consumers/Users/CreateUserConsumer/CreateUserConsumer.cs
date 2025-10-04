@@ -10,12 +10,10 @@ public class CreateUserConsumer(ILogger<CreateUserConsumer> logger) : IConsumer<
     {
         var message = context.Message;
 
-        logger.LogInformation("[CONSUMER] ✅ Получено событие создания пользователя: " +
-                              $"ID: {message.Id}, " +
-                              $"Email: {message.Email}, " +
-                              $"Имя: {message.FirstName} {message.LastName}, " +
+        logger.LogInformation("[CONSUMER] ✅ Получено событие создания пользователя: \n\t" +
+                              $"ID: {message.Id}, \n\t" +
+                              $"Email: {message.Email}, \n\t" +
+                              $"Имя: {message.FirstName} {message.LastName}, \n\t" +
                               $"Создан: {message.CreatedAt:yyyy-MM-dd HH:mm:ss}");
-
-        logger.LogInformation("[CONSUMER] ✅ Обработка пользователя завершена: " + message.Email);
     }
 }

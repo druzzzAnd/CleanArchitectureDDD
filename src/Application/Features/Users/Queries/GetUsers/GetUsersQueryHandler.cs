@@ -1,22 +1,20 @@
 ﻿using Application.Features.Users.Queries.GetUsers.Response;
-using Application.Interfaces.Repositories;
+using Application.Interfaces.Providers;
 using Mapster;
 using MediatR;
 
 namespace Application.Features.Users.Queries.GetUsers;
 
-public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, List<GetUsersResponse>>
+public class GetUsersQueryHandler(IUnitOfWorkFactory unitOfWorkFactory)
+    : IRequestHandler<GetUsersQuery, List<GetUsersResponse>>
 {
-    private readonly IUserRepository _userRepository;
-
-    public GetUsersQueryHandler(IUserRepository userRepository)
-    {
-        _userRepository = userRepository;
-    }
-
     public async Task<List<GetUsersResponse>?> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
-        var users = _userRepository.GetAll();
+        // create uow
+        await using var uow = unitOfWorkFactory.Create();
+
+        // main logic
+        var users = uow.UserRepository.GetAll();
 
         return users.Adapt<List<GetUsersResponse>>();
     }

@@ -9,7 +9,6 @@ public class UserRepository(PostgreDbContext context) : IUserRepository
     public void Create(User user)
     {
         context.Users.Add(user);
-        context.SaveChanges();
     }
 
     public List<User>? GetAll()
@@ -25,12 +24,10 @@ public class UserRepository(PostgreDbContext context) : IUserRepository
     public void Update(User user)
     {
         context.Users.Update(user);
-        context.SaveChanges();
     }
 
     public void Delete(User user)
     {
         context.Remove(user);
-        context.SaveChanges();
     }
 }

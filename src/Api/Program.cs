@@ -1,9 +1,7 @@
 using Application.DependencyInjection;
-using Application.Interfaces.Services;
 using Infrastructure.Consumers.Users.CreateUserConsumer;
 using Infrastructure.DbContexts;
 using Infrastructure.DependencyInjection;
-using Infrastructure.Services;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,26 +12,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add layers
-builder.Services.AddApplication(builder.Configuration);
-builder.Services.AddInfrastructure(builder.Configuration);
+// Add Logging
+builder.Services.AddLogging();
 
 // Database
 builder.Services.AddDbContext<PostgreDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// MassTransit + RabbitMQ
-//builder.Services.AddMassTransit(x =>
-//{
-//    x.UsingRabbitMq((context, cfg) =>
-//    {
-//        cfg.Host("localhost", "/", h =>
-//        {
-//            h.Username("guest");
-//            h.Password("guest");
-//        });
-//    });
-//});
+// Add layers
+builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // MassTransit + RabbitMQ
 builder.Services.AddMassTransit(x =>
@@ -56,9 +44,6 @@ builder.Services.AddMassTransit(x =>
         });
     });
 });
-
-// Message Bus
-builder.Services.AddScoped<IMessageBusService, MessageBusService>();
 
 var app = builder.Build();
 

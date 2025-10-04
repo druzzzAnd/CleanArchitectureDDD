@@ -1,5 +1,9 @@
-﻿using Application.Interfaces.Repositories;
+﻿using Application.Interfaces.Providers;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.Services;
+using Infrastructure.Providers;
 using Infrastructure.Repositories;
+using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +15,13 @@ public static class DependencyInjection
     {
         // Repositories
         services.AddScoped<IUserRepository, UserRepository>();
+
+        // Message Bus
+        services.AddScoped<IMessageBusService, MessageBusService>();
+
+        // UoW & UoW Factory
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
 
         return services;
     }

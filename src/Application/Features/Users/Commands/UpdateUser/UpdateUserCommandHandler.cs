@@ -1,29 +1,33 @@
 ﻿using Application.Features.Users.Commands.UpdateUser.Response;
-using Application.Interfaces.Repositories;
+using Application.Interfaces.Providers;
 using Mapster;
 using MediatR;
 
 namespace Application.Features.Users.Commands.UpdateUser;
 
-public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UpdateUserResponse>
+public class UpdateUserCommandHandler(
+    IUnitOfWorkFactory unitOfWorkFactory)
+    : IRequestHandler<UpdateUserCommand, UpdateUserResponse>
 {
-    private readonly IUserRepository _userRepository;
-
-    public UpdateUserCommandHandler(IUserRepository userRepository)
-    {
-        _userRepository = userRepository;
-    }
-
     public async Task<UpdateUserResponse> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
-        var user = _userRepository.GetById(request.UserId)
+        // create uow
+        await using var uow = unitOfWorkFactory.Create();
+
+        // main logic
+        var user = uow.UserRepository.GetById(request.UserId)
             ?? throw new Exception($"Не найден пользователь с Id {request.UserId}");
 
         user.Email = request.UpdateUserRequest.Email;
         user.FirstName = request.UpdateUserRequest.FirstName;
         user.LastName = request.UpdateUserRequest.LastName;
 
-        _userRepository.Update(user);
+        uow.UserRepository.Update(user);
+
+        await uow.SaveChangesAsync();
+
+        user = uow.UserRepository.GetById(request.UserId)
+            ?? throw new Exception($"Не найден пользователь с Id {request.UserId}");
 
         return user.Adapt<UpdateUserResponse>();
     }
